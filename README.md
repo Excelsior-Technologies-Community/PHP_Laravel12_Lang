@@ -1,5 +1,13 @@
 #  PHP_Laravel12_Lang
 
+<p align="center">
+    <img src="https://img.shields.io/badge/Laravel-12-red?style=for-the-badge&logo=laravel" />
+    <img src="https://img.shields.io/badge/PHP-8.2+-blue?style=for-the-badge&logo=php" />
+    <img src="https://img.shields.io/badge/Multi--Language-Supported-success?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
+</p>
+
+
 ---
 
 #  Overview
