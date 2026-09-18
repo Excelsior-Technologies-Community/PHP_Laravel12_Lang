@@ -1,29 +1,61 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LocalizationController;
+use App\Http\Controllers\LocalizedProductController;
+use App\Models\LanguageHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
-| Apply Locale From Session
+| Supported Languages
 |--------------------------------------------------------------------------
 */
 
-Route::get('/lang/{locale}', function ($locale) {
-
-    $availableLocales = ['en', 'hi', 'gu', 'es', 'fr'];
-
-    if (in_array($locale, $availableLocales)) {
-        session(['locale' => $locale]);
-    }
-
-    return back();
-});
+$supportedLocales = [
+    'en' => 'English',
+    'hi' => 'Hindi',
+    'gu' => 'Gujarati',
+    'es' => 'Spanish',
+    'fr' => 'French',
+];
 
 
 /*
 |--------------------------------------------------------------------------
-| Main Routes
+| Language Switcher
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/lang/{locale}', function ($locale) use ($supportedLocales) {
+
+    if (array_key_exists($locale, $supportedLocales)) {
+
+        $oldLocale = session('locale', config('app.locale', 'en'));
+
+        session([
+            'locale' => $locale,
+        ]);
+
+        App::setLocale($locale);
+
+        LanguageHistory::create([
+            'locale' => $locale,
+            'language_name' => $supportedLocales[$locale],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    return back();
+
+})->name('language.switch');
+
+
+/*
+|--------------------------------------------------------------------------
+| Home
 |--------------------------------------------------------------------------
 */
 
@@ -34,8 +66,15 @@ Route::get('/', function () {
     }
 
     return view('welcome');
-});
 
+})->name('home');
+
+
+/*
+|--------------------------------------------------------------------------
+| Multilingual Form
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/form', function () {
 
@@ -44,7 +83,8 @@ Route::get('/form', function () {
     }
 
     return view('form');
-});
+
+})->name('form');
 
 
 Route::post('/form', function (Request $request) {
@@ -58,5 +98,39 @@ Route::post('/form', function (Request $request) {
         'name'  => 'required|min:3',
     ]);
 
-    return back()->with('success', __('Form Submitted Successfully'));
-});
+    return back()->with(
+        'success',
+        __('Form Submitted Successfully')
+    );
+
+})->name('form.submit');
+
+
+/*
+|--------------------------------------------------------------------------
+| Multilingual Product Catalog
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/products', [
+    LocalizedProductController::class,
+    'index',
+])->middleware('set.locale')->name('products.index');
+
+
+Route::get('/products/{slug}', [
+    LocalizedProductController::class,
+    'show',
+])->middleware('set.locale')->name('products.show');
+
+
+/*
+|--------------------------------------------------------------------------
+| Localization Dashboard
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/localization-dashboard', [
+    LocalizationController::class,
+    'dashboard',
+])->middleware('set.locale')->name('localization.dashboard');
