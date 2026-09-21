@@ -1,95 +1,225 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>{{ $product->localized_name }}</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <style>
         body {
             background: #f5f7fb;
         }
 
-        .product-detail {
+        .product-box {
             background: white;
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, .08);
         }
 
         .price {
             font-size: 2rem;
             font-weight: 700;
         }
+
+        .related-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .07);
+        }
     </style>
+
 </head>
 
 <body>
 
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container">
+    <nav class="navbar navbar-dark bg-dark">
 
-        <a class="navbar-brand" href="{{ route('products.index') }}">
-            {{ __('Multilingual Products') }}
-        </a>
+        <div class="container">
 
-        <a
-            href="{{ route('products.index') }}"
-            class="btn btn-outline-light btn-sm"
-        >
-            {{ __('Back to Products') }}
-        </a>
+            <a
+                class="navbar-brand"
+                href="{{ route('products.index') }}">
+                {{ __('Multilingual Products') }}
+            </a>
 
-    </div>
-</nav>
+            <div class="d-flex gap-2">
 
+                <a
+                    href="{{ route('products.index') }}"
+                    class="btn btn-outline-light btn-sm">
+                    {{ __('Products') }}
+                </a>
 
-<div class="container py-5">
+                <a
+                    href="{{ route('products.favorites') }}"
+                    class="btn btn-outline-light btn-sm">
+                    {{ __('Favorites') }}
+                </a>
 
-    <div class="product-detail">
+                <a
+                    href="{{ route('products.compare') }}"
+                    class="btn btn-outline-light btn-sm">
+                    {{ __('Compare') }}
+                </a>
 
-        <span class="badge bg-secondary mb-3">
-            {{ $product->category ?? 'General' }}
-        </span>
-
-        <h1 class="fw-bold mb-3">
-            {{ $product->localized_name }}
-        </h1>
-
-        <p class="text-muted fs-5 mb-4">
-            {{ $product->localized_description }}
-        </p>
-
-        <div class="price mb-4">
-            ₹{{ number_format($product->price, 2) }}
-        </div>
-
-        <div class="mb-4">
-
-            <strong>
-                {{ __('Current Language') }}:
-            </strong>
-
-            {{ strtoupper(app()->getLocale()) }}
+            </div>
 
         </div>
 
-        <a
-            href="{{ route('products.index') }}"
-            class="btn btn-dark"
-        >
-            {{ __('Back to Products') }}
-        </a>
+    </nav>
+
+
+    <div class="container py-5">
+
+        <div class="product-box">
+
+            <div class="mb-3">
+
+                <span class="badge bg-secondary">
+                    {{ $product->category ?? __('General') }}
+                </span>
+
+                <span class="badge bg-primary">
+                    {{ $product->translation_percentage }}%
+                    {{ __('Translated') }}
+                </span>
+
+            </div>
+
+
+            <h1 class="fw-bold">
+                {{ $product->localized_name }}
+            </h1>
+
+
+            <p class="text-muted fs-5">
+                {{ $product->localized_description }}
+            </p>
+
+
+            <div class="price my-4">
+
+                ₹{{ number_format($product->price, 2) }}
+
+            </div>
+
+
+            <div class="d-flex gap-2 flex-wrap">
+
+                <form
+                    method="POST"
+                    action="{{ route('products.favorite', $product->id) }}">
+
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger">
+                        {{ in_array($product->id, $favoriteIds)
+                        ? __('Remove Favorite')
+                        : __('Add to Favorites') }}
+                    </button>
+
+                </form>
+
+
+                <form
+                    method="POST"
+                    action="{{ route('products.compare.toggle', $product->id) }}">
+
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="btn btn-warning">
+                        {{ in_array($product->id, $compareIds)
+                        ? __('Remove from Compare')
+                        : __('Add to Compare') }}
+                    </button>
+
+                </form>
+
+
+                <a
+                    href="{{ route('products.index') }}"
+                    class="btn btn-outline-dark">
+                    {{ __('Back to Products') }}
+                </a>
+
+            </div>
+
+        </div>
+
+
+        @if($relatedProducts->count())
+
+        <div class="mt-5">
+
+            <h2 class="fw-bold mb-4">
+                {{ __('Related Products') }}
+            </h2>
+
+
+            <div class="row g-4">
+
+                @foreach($relatedProducts as $related)
+
+                <div class="col-md-4">
+
+                    <div class="card related-card h-100">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold">
+                                {{ $related->localized_name }}
+                            </h5>
+
+                            <p class="text-muted">
+
+                                {{ \Illuminate\Support\Str::limit(
+                                        $related->localized_description,
+                                        100
+                                    ) }}
+
+                            </p>
+
+                            <h5>
+                                ₹{{ number_format($related->price, 2) }}
+                            </h5>
+
+                            <a
+                                href="{{ route('products.show', $related->slug) }}"
+                                class="btn btn-dark mt-2">
+                                {{ __('View Details') }}
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+        @endif
 
     </div>
-
-</div>
 
 </body>
+
 </html>
