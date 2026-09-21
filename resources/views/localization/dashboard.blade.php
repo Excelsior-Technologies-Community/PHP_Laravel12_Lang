@@ -7,30 +7,23 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+        content="width=device-width, initial-scale=1.0">
 
     <title>{{ __('Localization Dashboard') }}</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <style>
-
         body {
             background: #f5f7fb;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
         }
 
         .stat-card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
             height: 100%;
         }
 
@@ -42,113 +35,150 @@
         .section-card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .06);
         }
-
-        .language-code {
-            font-family: monospace;
-            font-weight: 700;
-        }
-
     </style>
 
 </head>
 
 <body>
 
+    <nav class="navbar navbar-dark bg-dark">
 
-{{-- Navbar --}}
-
-<nav class="navbar navbar-dark bg-dark">
-
-    <div class="container">
-
-        <a
-            class="navbar-brand"
-            href="{{ route('home') }}"
-        >
-            {{ __('Localization Dashboard') }}
-        </a>
-
-
-        <div class="d-flex gap-2">
+        <div class="container">
 
             <a
-                href="{{ route('home') }}"
-                class="btn btn-outline-light btn-sm"
-            >
-                {{ __('Home') }}
+                class="navbar-brand fw-bold"
+                href="{{ route('home') }}">
+                {{ __('Localization Dashboard') }}
             </a>
 
-            <a
-                href="{{ route('products.index') }}"
-                class="btn btn-outline-light btn-sm"
-            >
-                {{ __('Products') }}
-            </a>
 
-            <a
-                href="{{ route('form') }}"
-                class="btn btn-outline-light btn-sm"
-            >
-                {{ __('Form') }}
-            </a>
+            <div class="d-flex gap-2">
+
+                <a
+                    href="{{ route('products.index') }}"
+                    class="btn btn-outline-light btn-sm">
+                    {{ __('Products') }}
+                </a>
+
+                <a
+                    href="{{ route('form') }}"
+                    class="btn btn-outline-light btn-sm">
+                    {{ __('Form') }}
+                </a>
+
+            </div>
 
         </div>
 
-    </div>
-
-</nav>
+    </nav>
 
 
+    <div class="container py-5">
 
-<div class="container py-5">
+        <div class="text-center mb-5">
 
+            <h1 class="fw-bold">
+                {{ __('Localization Dashboard') }}
+            </h1>
 
-    {{-- Page Header --}}
+            <p class="text-muted">
+                {{ __('Monitor languages, translations and products.') }}
+            </p>
 
-    <div class="text-center mb-5">
+            <span class="badge bg-primary">
 
-        <h1 class="fw-bold">
-            {{ __('Localization Dashboard') }}
-        </h1>
+                {{ __('Current Language') }}:
 
-        <p class="text-muted">
+                {{ strtoupper(app()->getLocale()) }}
 
-            {{ __('Monitor languages, translations and language usage.') }}
+            </span>
 
-        </p>
-
-        <span class="badge bg-primary">
-
-            {{ __('Current Language') }}:
-            {{ strtoupper(app()->getLocale()) }}
-
-        </span>
-
-    </div>
+        </div>
 
 
+        {{-- Statistics --}}
 
-    {{-- Statistics Cards --}}
+        <div class="row g-4 mb-5">
 
-    <div class="row g-4 mb-5">
+            <div class="col-md-3">
+
+                <div class="card stat-card">
+
+                    <div class="card-body text-center">
+
+                        <h6>
+                            {{ __('Languages') }}
+                        </h6>
+
+                        <div class="stat-number text-primary">
+                            {{ $totalLanguages }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
-        {{-- Available Languages --}}
+            <div class="col-md-3">
 
-        <div class="col-md-6 col-lg-3">
+                <div class="card stat-card">
 
-            <div class="card stat-card">
+                    <div class="card-body text-center">
 
-                <div class="card-body text-center">
+                        <h6>
+                            {{ __('Products') }}
+                        </h6>
 
-                    <h6 class="text-muted">
-                        {{ __('Available Languages') }}
-                    </h6>
+                        <div class="stat-number text-success">
+                            {{ $totalProducts }}
+                        </div>
 
-                    <div class="stat-number text-primary">
-                        {{ $totalLanguages }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card stat-card">
+
+                    <div class="card-body text-center">
+
+                        <h6>
+                            {{ __('Active Products') }}
+                        </h6>
+
+                        <div class="stat-number text-info">
+                            {{ $activeProducts }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card stat-card">
+
+                    <div class="card-body text-center">
+
+                        <h6>
+                            {{ __('Categories') }}
+                        </h6>
+
+                        <div class="stat-number text-warning">
+                            {{ $totalCategories }}
+                        </div>
+
                     </div>
 
                 </div>
@@ -158,21 +188,66 @@
         </div>
 
 
+        {{-- Price Statistics --}}
 
-        {{-- Total Products --}}
+        <div class="row g-4 mb-5">
 
-        <div class="col-md-6 col-lg-3">
+            <div class="col-md-4">
 
-            <div class="card stat-card">
+                <div class="card stat-card">
 
-                <div class="card-body text-center">
+                    <div class="card-body text-center">
 
-                    <h6 class="text-muted">
-                        {{ __('Total Products') }}
-                    </h6>
+                        <h6>
+                            {{ __('Average Price') }}
+                        </h6>
 
-                    <div class="stat-number text-success">
-                        {{ $totalProducts }}
+                        <div class="stat-number">
+                            ₹{{ number_format($averagePrice, 2) }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card stat-card">
+
+                    <div class="card-body text-center">
+
+                        <h6>
+                            {{ __('Minimum Price') }}
+                        </h6>
+
+                        <div class="stat-number">
+                            ₹{{ number_format($minimumPrice, 2) }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card stat-card">
+
+                    <div class="card-body text-center">
+
+                        <h6>
+                            {{ __('Maximum Price') }}
+                        </h6>
+
+                        <div class="stat-number">
+                            ₹{{ number_format($maximumPrice, 2) }}
+                        </div>
+
                     </div>
 
                 </div>
@@ -182,21 +257,67 @@
         </div>
 
 
+        {{-- Translation Status --}}
 
-        {{-- Active Products --}}
+        <div class="card section-card mb-5">
 
-        <div class="col-md-6 col-lg-3">
+            <div class="card-body">
 
-            <div class="card stat-card">
+                <h4 class="fw-bold mb-4">
+                    {{ __('Translation Status') }}
+                </h4>
 
-                <div class="card-body text-center">
 
-                    <h6 class="text-muted">
-                        {{ __('Active Products') }}
-                    </h6>
+                <div class="row text-center">
 
-                    <div class="stat-number text-info">
-                        {{ $activeProducts }}
+                    <div class="col-md-4">
+
+                        <div class="alert alert-success">
+
+                            <h5>
+                                {{ __('Complete') }}
+                            </h5>
+
+                            <h2>
+                                {{ $translationComplete }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="alert alert-warning">
+
+                            <h5>
+                                {{ __('Partial') }}
+                            </h5>
+
+                            <h2>
+                                {{ $translationPartial }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="alert alert-danger">
+
+                            <h5>
+                                {{ __('Incomplete') }}
+                            </h5>
+
+                            <h2>
+                                {{ $translationIncomplete }}
+                            </h2>
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -206,96 +327,139 @@
         </div>
 
 
+        {{-- Category Statistics --}}
 
-        {{-- Total Translations --}}
+        <div class="card section-card mb-5">
 
-        <div class="col-md-6 col-lg-3">
+            <div class="card-body">
 
-            <div class="card stat-card">
+                <h4 class="fw-bold mb-4">
+                    {{ __('Products by Category') }}
+                </h4>
 
-                <div class="card-body text-center">
 
-                    <h6 class="text-muted">
-                        {{ __('Total Translations') }}
-                    </h6>
+                @if($categoryUsage->count())
 
-                    <div class="stat-number text-warning">
-                        {{ $totalTranslations }}
-                    </div>
+                <div class="table-responsive">
+
+                    <table class="table table-hover">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>
+                                    {{ __('Category') }}
+                                </th>
+
+                                <th>
+                                    {{ __('Products') }}
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach($categoryUsage as $category)
+
+                            <tr>
+
+                                <td>
+                                    {{ $category->category }}
+                                </td>
+
+                                <td>
+
+                                    <span class="badge bg-primary">
+
+                                        {{ $category->total }}
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
 
                 </div>
+
+                @else
+
+                <div class="alert alert-info">
+                    {{ __('No category data available.') }}
+                </div>
+
+                @endif
 
             </div>
 
         </div>
 
-    </div>
+
+        {{-- Languages --}}
+
+        <div class="card section-card mb-5">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+                    {{ __('Supported Languages') }}
+                </h4>
 
 
+                <div class="row g-3">
 
-    {{-- Supported Languages --}}
+                    @foreach($languages as $code => $language)
 
-    <div class="card section-card mb-5">
+                    <div class="col-md-4">
 
-        <div class="card-body">
+                        <div class="border rounded p-3 d-flex justify-content-between">
 
-            <h4 class="fw-bold mb-4">
-                {{ __('Supported Languages') }}
-            </h4>
+                            <strong>
+                                {{ $language }}
+                            </strong>
 
-
-            <div class="row g-3">
-
-                @foreach($languages as $code => $language)
-
-                    <div class="col-md-6 col-lg-4">
-
-                        <div class="border rounded p-3 d-flex justify-content-between align-items-center">
-
-                            <div>
-
-                                <strong>
-                                    {{ $language }}
-                                </strong>
-
-                            </div>
-
-                            <span class="badge bg-dark language-code">
-
+                            <span class="badge bg-dark">
                                 {{ strtoupper($code) }}
-
                             </span>
 
                         </div>
 
                     </div>
 
-                @endforeach
+                    @endforeach
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+
+        {{-- Language Usage --}}
+
+        <div class="card section-card mb-5">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+                    {{ __('Language Usage Statistics') }}
+                </h4>
 
 
-
-    {{-- Language Usage Statistics --}}
-
-    <div class="card section-card mb-5">
-
-        <div class="card-body">
-
-            <h4 class="fw-bold mb-4">
-                {{ __('Language Usage Statistics') }}
-            </h4>
-
-
-            @if($languageUsage->count())
+                @if($languageUsage->count())
 
                 <div class="table-responsive">
 
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover">
 
                         <thead class="table-dark">
 
@@ -322,39 +486,25 @@
 
                             @foreach($languageUsage as $usage)
 
-                                <tr>
+                            <tr>
 
-                                    <td>
+                                <td>
+                                    {{ $usage->language_name }}
+                                </td>
 
-                                        <strong>
-                                            {{ $usage->language_name }}
-                                        </strong>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ strtoupper($usage->locale) }}
+                                    </span>
+                                </td>
 
-                                    </td>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{ $usage->total }}
+                                    </span>
+                                </td>
 
-
-                                    <td>
-
-                                        <span class="badge bg-secondary">
-
-                                            {{ strtoupper($usage->locale) }}
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="badge bg-primary">
-
-                                            {{ $usage->total }}
-
-                                        </span>
-
-                                    </td>
-
-                                </tr>
+                            </tr>
 
                             @endforeach
 
@@ -364,40 +514,37 @@
 
                 </div>
 
-            @else
+                @else
 
-                <div class="alert alert-info mb-0">
+                <div class="alert alert-info">
 
                     {{ __('No language history available yet.') }}
 
                 </div>
 
-            @endif
+                @endif
+
+            </div>
 
         </div>
 
-    </div>
+
+        {{-- Recent Changes --}}
+
+        <div class="card section-card">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+                    {{ __('Recent Language Changes') }}
+                </h4>
 
 
-
-    {{-- Recent Language Changes --}}
-
-    <div class="card section-card">
-
-        <div class="card-body">
-
-            <h4 class="fw-bold mb-4">
-
-                {{ __('Recent Language Changes') }}
-
-            </h4>
-
-
-            @if($recentChanges->count())
+                @if($recentChanges->count())
 
                 <div class="table-responsive">
 
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover">
 
                         <thead class="table-dark">
 
@@ -428,40 +575,31 @@
 
                             @foreach($recentChanges as $history)
 
-                                <tr>
+                            <tr>
 
-                                    <td>
+                                <td>
+                                    {{ $history->language_name }}
+                                </td>
 
-                                        {{ $history->language_name }}
+                                <td>
 
-                                    </td>
+                                    <span class="badge bg-secondary">
 
+                                        {{ strtoupper($history->locale) }}
 
-                                    <td>
+                                    </span>
 
-                                        <span class="badge bg-secondary">
+                                </td>
 
-                                            {{ strtoupper($history->locale) }}
+                                <td>
+                                    {{ $history->ip_address ?? 'N/A' }}
+                                </td>
 
-                                        </span>
+                                <td>
+                                    {{ $history->created_at->format('d M Y, h:i A') }}
+                                </td>
 
-                                    </td>
-
-
-                                    <td>
-
-                                        {{ $history->ip_address ?? 'N/A' }}
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {{ $history->created_at->format('d M Y, h:i A') }}
-
-                                    </td>
-
-                                </tr>
+                            </tr>
 
                             @endforeach
 
@@ -471,23 +609,21 @@
 
                 </div>
 
-            @else
+                @else
 
-                <div class="alert alert-info mb-0">
+                <div class="alert alert-info">
 
                     {{ __('No language changes recorded.') }}
 
                 </div>
 
-            @endif
+                @endif
+
+            </div>
 
         </div>
 
     </div>
-
-
-</div>
-
 
 </body>
 

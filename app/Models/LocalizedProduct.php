@@ -45,4 +45,52 @@ class LocalizedProduct extends Model
             ?? $this->description_translations['en']
             ?? '';
     }
+
+    /**
+     * Translation completeness.
+     */
+    public function getTranslationCountAttribute(): int
+    {
+        $languages = [
+            'en',
+            'hi',
+            'gu',
+            'es',
+            'fr',
+        ];
+
+        $translations = $this->name_translations ?? [];
+
+        return collect($languages)
+            ->filter(function ($language) use ($translations) {
+                return !empty($translations[$language]);
+            })
+            ->count();
+    }
+
+    /**
+     * Translation percentage.
+     */
+    public function getTranslationPercentageAttribute(): int
+    {
+        return (int) round(
+            ($this->translation_count / 5) * 100
+        );
+    }
+
+    /**
+     * Translation status.
+     */
+    public function getTranslationStatusAttribute(): string
+    {
+        if ($this->translation_percentage >= 100) {
+            return 'Complete';
+        }
+
+        if ($this->translation_percentage >= 60) {
+            return 'Partial';
+        }
+
+        return 'Incomplete';
+    }
 }
