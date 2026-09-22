@@ -103,10 +103,32 @@
             </h1>
 
 
-            <p class="text-muted fs-5">
+            <p class="text-muted fs-5" id="product-description-text">
                 {{ $product->localized_description }}
             </p>
 
+            {{-- MULTILINGUAL TEXT-TO-SPEECH (TTS) AUDIO READER --}}
+            <div class="p-3 my-3 bg-light border rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fs-4">🗣️</span>
+                    <div>
+                        <strong class="d-block text-dark">{{ __('Multilingual Audio Reader') }}</strong>
+                        <small class="text-muted">{{ __('Listen to product description in') }} <span class="badge bg-dark">{{ strtoupper(app()->getLocale()) }}</span></small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2" id="tts-controls">
+                    <button type="button" class="btn btn-sm btn-success fw-bold d-flex align-items-center gap-1" id="btn-speak">
+                        <span>🔊 {{ __('Listen') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary fw-bold d-flex align-items-center gap-1 d-none" id="btn-pause">
+                        <span>⏸️ {{ __('Pause') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger fw-bold d-flex align-items-center gap-1 d-none" id="btn-stop">
+                        <span>⏹️ {{ __('Stop') }}</span>
+                    </button>
+                </div>
+            </div>
 
             <div class="price my-4">
 
@@ -220,6 +242,82 @@
 
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnSpeak = document.getElementById('btn-speak');
+            const btnPause = document.getElementById('btn-pause');
+            const btnStop = document.getElementById('btn-stop');
+
+            if (!('speechSynthesis' in window)) {
+                btnSpeak.disabled = true;
+                btnSpeak.innerText = '⚠️ Speech Synthesis Unavailable';
+                return;
+            }
+
+            const currentLocale = "{{ app()->getLocale() }}";
+            const localeVoiceMap = {
+                'gu': 'gu-IN',
+                'hi': 'hi-IN',
+                'es': 'es-ES',
+                'fr': 'fr-FR',
+                'en': 'en-US'
+            };
+
+            const textToSpeak = "{{ addslashes($product->localized_name) }}. {{ addslashes($product->localized_description) }}";
+            let utterance = null;
+
+            btnSpeak.addEventListener('click', function() {
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                    btnPause.innerText = '⏸️ {{ __('Pause') }}';
+                    return;
+                }
+
+                window.speechSynthesis.cancel();
+                utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = localeVoiceMap[currentLocale] || 'en-US';
+                utterance.rate = 0.95;
+
+                utterance.onstart = function() {
+                    btnPause.classList.remove('d-none');
+                    btnStop.classList.remove('d-none');
+                    btnSpeak.classList.add('d-none');
+                };
+
+                utterance.onend = function() {
+                    resetButtons();
+                };
+
+                utterance.onerror = function() {
+                    resetButtons();
+                };
+
+                window.speechSynthesis.speak(utterance);
+            });
+
+            btnPause.addEventListener('click', function() {
+                if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                    window.speechSynthesis.pause();
+                    btnPause.innerText = '▶️ {{ __('Resume') }}';
+                } else if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                    btnPause.innerText = '⏸️ {{ __('Pause') }}';
+                }
+            });
+
+            btnStop.addEventListener('click', function() {
+                window.speechSynthesis.cancel();
+                resetButtons();
+            });
+
+            function resetButtons() {
+                btnPause.classList.add('d-none');
+                btnStop.classList.add('d-none');
+                btnSpeak.classList.remove('d-none');
+                btnPause.innerText = '⏸️ {{ __('Pause') }}';
+            }
+        });
+    </script>
 </body>
 
 </html>
