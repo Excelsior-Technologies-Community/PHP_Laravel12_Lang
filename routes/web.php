@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\LocalizationController;
 use App\Http\Controllers\LocalizedProductController;
+use App\Http\Controllers\TranslationEditorController;
+use App\Http\Middleware\AutoDetectLocaleMiddleware;
 use App\Models\LanguageHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -12,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 | Supported Languages
 |--------------------------------------------------------------------------
 */
-
 $supportedLocales = [
     'en' => 'English',
     'hi' => 'Hindi',
@@ -20,6 +21,13 @@ $supportedLocales = [
     'es' => 'Spanish',
     'fr' => 'French',
 ];
+
+/*
+|--------------------------------------------------------------------------
+| Auto-Detect Browser Locale Middleware Group
+|--------------------------------------------------------------------------
+*/
+Route::middleware([AutoDetectLocaleMiddleware::class])->group(function () use ($supportedLocales) {
 
 
 /*
@@ -210,3 +218,14 @@ Route::get(
 )
     ->middleware('set.locale')
     ->name('localization.dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Translation Key Editor & Scanner
+|--------------------------------------------------------------------------
+*/
+Route::get('/localization/editor', [TranslationEditorController::class, 'index'])->name('localization.editor');
+Route::post('/localization/editor/save', [TranslationEditorController::class, 'save'])->name('localization.editor.save');
+Route::post('/localization/editor/add-key', [TranslationEditorController::class, 'addKey'])->name('localization.editor.add-key');
+
+});
